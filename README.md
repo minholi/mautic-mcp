@@ -2,6 +2,31 @@
 
 A comprehensive Model Context Protocol (MCP) server that provides full integration with Mautic marketing automation platform.
 
+[![GitHub Stars](https://img.shields.io/github/stars/Cbrown35/mantic-MCP?style=social)](https://github.com/Cbrown35/mantic-MCP/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/Cbrown35/mantic-MCP)](https://github.com/Cbrown35/mantic-MCP/issues)
+[![GitHub License](https://img.shields.io/github/license/Cbrown35/mantic-MCP)](https://github.com/Cbrown35/mantic-MCP/blob/main/LICENSE)
+
+## 🚀 Quick Start
+
+```bash
+# Clone and setup
+git clone https://github.com/Cbrown35/mantic-MCP.git
+cd mantic-MCP
+npm install
+
+# Configure your Mautic credentials
+cp .env.example .env
+# Edit .env with your Mautic API credentials
+
+# Build and run
+npm run build
+```
+
+Then add the server to your MCP configuration and start using natural language commands like:
+- "Search for all contacts with gmail in their email"
+- "Create a new contact named John Doe"
+- "List all email campaigns"
+
 ## Features
 
 This MCP server provides complete access to your Mautic instance with the following capabilities:
@@ -56,8 +81,8 @@ This MCP server provides complete access to your Mautic instance with the follow
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd mautic-server
+   git clone https://github.com/Cbrown35/mantic-MCP.git
+   cd mantic-MCP
    ```
 
 2. **Install dependencies:**
@@ -187,6 +212,99 @@ To modify or extend the server:
 2. Build the server: `npm run build`
 3. The server will automatically reload with your changes
 
+## 🚀 Deployment
+
+### Production Deployment
+
+1. **Clone and build:**
+   ```bash
+   git clone https://github.com/Cbrown35/mantic-MCP.git
+   cd mantic-MCP
+   npm install
+   npm run build
+   ```
+
+2. **Set up environment variables** in your production environment
+3. **Configure your MCP client** to point to the built server
+4. **Monitor logs** for any authentication or API issues
+
+### Docker Deployment (Coming Soon)
+
+Docker support is planned for easier deployment and scaling.
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+### Development Setup
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork:**
+   ```bash
+   git clone https://github.com/yourusername/mantic-MCP.git
+   cd mantic-MCP
+   ```
+
+3. **Create a feature branch:**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+5. **Make your changes** and test thoroughly
+6. **Build and test:**
+   ```bash
+   npm run build
+   # Test your changes with a real Mautic instance
+   ```
+
+7. **Commit and push:**
+   ```bash
+   git add .
+   git commit -m "Add your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+8. **Create a Pull Request** on GitHub
+
+### Contribution Guidelines
+
+- Follow TypeScript best practices
+- Add comprehensive error handling
+- Update documentation for new features
+- Test with real Mautic instances when possible
+- Maintain backward compatibility
+
+### Reporting Issues
+
+Found a bug or have a feature request? Please [open an issue](https://github.com/Cbrown35/mantic-MCP/issues) with:
+
+- Clear description of the problem or feature
+- Steps to reproduce (for bugs)
+- Your environment details (Node.js version, Mautic version, etc.)
+- Expected vs actual behavior
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with the [Model Context Protocol SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- Integrates with [Mautic](https://www.mautic.org/) marketing automation platform
+- Inspired by the need for seamless marketing automation integration
+
 ## Support
 
-This server provides comprehensive integration with Mautic's REST API. For specific API documentation, refer to your Mautic instance's API documentation at `https://mailer.dzind.com/api/doc`.
+This server provides comprehensive integration with Mautic's REST API. For specific API documentation, refer to your Mautic instance's API documentation.
+
+### Getting Help
+
+- 📖 [Documentation](https://github.com/Cbrown35/mantic-MCP/blob/main/README.md)
+- 🐛 [Report Issues](https://github.com/Cbrown35/mantic-MCP/issues)
+- 💬 [Discussions](https://github.com/Cbrown35/mantic-MCP/discussions)
+- 📧 Contact: [Create an issue](https://github.com/Cbrown35/mantic-MCP/issues/new) for support
