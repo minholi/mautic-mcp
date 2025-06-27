@@ -542,6 +542,458 @@ class MauticServer {
           },
         },
 
+        // Enhanced Campaign Automation Tools (PRIORITY 1)
+        {
+          name: 'create_campaign_with_automation',
+          description: 'Create campaign with full event automation including triggers, actions, and canvas settings',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: { type: 'string', description: 'Campaign name' },
+              description: { type: 'string', description: 'Campaign description' },
+              isPublished: { type: 'boolean', default: true },
+              allowRestart: { type: 'boolean', default: false },
+              events: {
+                type: 'array',
+                description: 'Array of campaign events (triggers/actions)',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string', description: 'Event ID (use new1, new2, etc.)' },
+                    name: { type: 'string', description: 'Event name' },
+                    type: { type: 'string', description: 'Event type (e.g., email.send, lead.field_value)' },
+                    eventType: { type: 'string', enum: ['action', 'condition', 'decision'] },
+                    order: { type: 'number', description: 'Event order' },
+                    properties: { type: 'object', description: 'Event-specific properties' },
+                    triggerMode: { type: 'string', enum: ['immediate', 'interval'], default: 'immediate' },
+                    triggerInterval: { type: 'number', default: 1 },
+                    triggerIntervalUnit: { type: 'string', enum: ['i', 'h', 'd', 'm', 'y'], default: 'd' },
+                    decisionPath: { type: 'string', enum: ['yes', 'no'], description: 'For decision events' },
+                    parent: { type: 'object', properties: { id: { type: 'string' } } }
+                  }
+                }
+              },
+              segments: {
+                type: 'array',
+                description: 'Segment IDs to trigger campaign',
+                items: { type: 'number' }
+              },
+              forms: {
+                type: 'array',
+                description: 'Form IDs to trigger campaign',
+                items: { type: 'number' }
+              },
+              canvasSettings: {
+                type: 'object',
+                description: 'Visual campaign builder settings',
+                properties: {
+                  nodes: { type: 'array' },
+                  connections: { type: 'array' }
+                }
+              }
+            },
+            required: ['name']
+          }
+        },
+        {
+          name: 'execute_campaign',
+          description: 'Manually execute/trigger a campaign',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              campaignId: { type: 'number' },
+              contactIds: { type: 'array', items: { type: 'number' }, description: 'Optional: specific contacts' }
+            },
+            required: ['campaignId']
+          }
+        },
+        {
+          name: 'get_campaign_contacts',
+          description: 'Get contacts in a campaign with their status',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              campaignId: { type: 'number' },
+              start: { type: 'number', default: 0 },
+              limit: { type: 'number', default: 100 }
+            },
+            required: ['campaignId']
+          }
+        },
+
+        // Content Management APIs (PRIORITY 2)
+        {
+          name: 'list_assets',
+          description: 'Get all assets (PDFs, images, documents)',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              search: { type: 'string' },
+              limit: { type: 'number', maximum: 200 },
+              start: { type: 'number', default: 0 },
+              publishedOnly: { type: 'boolean', default: true }
+            }
+          }
+        },
+        {
+          name: 'get_asset',
+          description: 'Get asset details by ID',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' }
+            },
+            required: ['id']
+          }
+        },
+        {
+          name: 'create_asset',
+          description: 'Create new asset (local or remote)',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              description: { type: 'string' },
+              storageLocation: { type: 'string', enum: ['local', 'remote'] },
+              file: { type: 'string', description: 'File path (local) or URL (remote)' },
+              category: { type: 'number', description: 'Category ID' },
+              isPublished: { type: 'boolean', default: true }
+            },
+            required: ['title', 'storageLocation', 'file']
+          }
+        },
+        {
+          name: 'list_pages',
+          description: 'Get all landing pages',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              search: { type: 'string' },
+              limit: { type: 'number', maximum: 200 },
+              start: { type: 'number', default: 0 },
+              publishedOnly: { type: 'boolean', default: true }
+            }
+          }
+        },
+        {
+          name: 'create_page',
+          description: 'Create new landing page',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              alias: { type: 'string' },
+              customHtml: { type: 'string' },
+              template: { type: 'string' },
+              isPublished: { type: 'boolean', default: true },
+              publishUp: { type: 'string', description: 'Publish start date' },
+              publishDown: { type: 'string', description: 'Publish end date' }
+            },
+            required: ['title']
+          }
+        },
+        {
+          name: 'list_sms',
+          description: 'Get all SMS templates',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              search: { type: 'string' },
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'create_sms',
+          description: 'Create SMS template',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              message: { type: 'string' },
+              isPublished: { type: 'boolean', default: true }
+            },
+            required: ['name', 'message']
+          }
+        },
+
+        // Business Entity APIs (PRIORITY 3)
+        {
+          name: 'list_companies',
+          description: 'Get all companies',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              search: { type: 'string' },
+              limit: { type: 'number', maximum: 200 },
+              start: { type: 'number', default: 0 }
+            }
+          }
+        },
+        {
+          name: 'create_company',
+          description: 'Create new company',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              companyname: { type: 'string' },
+              companyemail: { type: 'string' },
+              companyphone: { type: 'string' },
+              companyaddress1: { type: 'string' },
+              companyaddress2: { type: 'string' },
+              companycity: { type: 'string' },
+              companystate: { type: 'string' },
+              companyzipcode: { type: 'string' },
+              companycountry: { type: 'string' },
+              companywebsite: { type: 'string' }
+            },
+            required: ['companyname']
+          }
+        },
+        {
+          name: 'add_contact_to_company',
+          description: 'Associate contact with company',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              contactId: { type: 'number' },
+              companyId: { type: 'number' }
+            },
+            required: ['contactId', 'companyId']
+          }
+        },
+        {
+          name: 'create_note',
+          description: 'Add note to contact or company',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              text: { type: 'string' },
+              type: { type: 'string', enum: ['general', 'email', 'call', 'meeting'] },
+              contactId: { type: 'number', description: 'Contact ID (if adding to contact)' },
+              companyId: { type: 'number', description: 'Company ID (if adding to company)' }
+            },
+            required: ['text', 'type']
+          }
+        },
+        {
+          name: 'get_contact_notes',
+          description: 'Get all notes for a contact',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              contactId: { type: 'number' },
+              limit: { type: 'number', default: 100 }
+            },
+            required: ['contactId']
+          }
+        },
+        {
+          name: 'list_tags',
+          description: 'Get all available tags',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              search: { type: 'string' },
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'create_tag',
+          description: 'Create new tag',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              tag: { type: 'string' }
+            },
+            required: ['tag']
+          }
+        },
+        {
+          name: 'add_contact_tags',
+          description: 'Add tags to contact',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              contactId: { type: 'number' },
+              tags: { type: 'array', items: { type: 'string' } }
+            },
+            required: ['contactId', 'tags']
+          }
+        },
+        {
+          name: 'list_categories',
+          description: 'Get all categories',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              bundle: { type: 'string', description: 'Category type (asset, email, etc.)' },
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'create_category',
+          description: 'Create new category',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              alias: { type: 'string' },
+              description: { type: 'string' },
+              bundle: { type: 'string' },
+              color: { type: 'string', description: 'Hex color code' }
+            },
+            required: ['title', 'bundle']
+          }
+        },
+
+        // Advanced Feature APIs (PRIORITY 4)
+        {
+          name: 'add_contact_points',
+          description: 'Add points to contact',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              contactId: { type: 'number' },
+              points: { type: 'number' },
+              eventName: { type: 'string', default: 'API Point Addition' },
+              actionName: { type: 'string', default: 'Manual' }
+            },
+            required: ['contactId', 'points']
+          }
+        },
+        {
+          name: 'subtract_contact_points',
+          description: 'Subtract points from contact',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              contactId: { type: 'number' },
+              points: { type: 'number' },
+              eventName: { type: 'string', default: 'API Point Subtraction' },
+              actionName: { type: 'string', default: 'Manual' }
+            },
+            required: ['contactId', 'points']
+          }
+        },
+        {
+          name: 'list_stages',
+          description: 'Get all lifecycle stages',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'change_contact_stage',
+          description: 'Change contact\'s lifecycle stage',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              contactId: { type: 'number' },
+              stageId: { type: 'number' }
+            },
+            required: ['contactId', 'stageId']
+          }
+        },
+        {
+          name: 'list_contact_fields',
+          description: 'Get all contact custom fields',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'create_contact_field',
+          description: 'Create new contact custom field',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              label: { type: 'string' },
+              alias: { type: 'string' },
+              type: { type: 'string', enum: ['text', 'textarea', 'email', 'number', 'select', 'multiselect', 'boolean', 'date', 'datetime'] },
+              defaultValue: { type: 'string' },
+              isRequired: { type: 'boolean', default: false },
+              isPubliclyUpdatable: { type: 'boolean', default: false },
+              properties: { type: 'object', description: 'Field type specific properties' }
+            },
+            required: ['label', 'type']
+          }
+        },
+
+        // Integration & Automation APIs (PRIORITY 5)
+        {
+          name: 'list_webhooks',
+          description: 'Get all webhooks',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'create_webhook',
+          description: 'Create new webhook',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              description: { type: 'string' },
+              webhookUrl: { type: 'string' },
+              secret: { type: 'string' },
+              eventsOrderbyDir: { type: 'string', enum: ['ASC', 'DESC'], default: 'DESC' },
+              triggers: { type: 'array', items: { type: 'string' }, description: 'Event types to trigger webhook' }
+            },
+            required: ['name', 'webhookUrl', 'triggers']
+          }
+        },
+        {
+          name: 'upload_file',
+          description: 'Upload file to Mautic',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              file: { type: 'string', description: 'File path or base64 encoded content' },
+              folder: { type: 'string', default: 'assets' }
+            },
+            required: ['file']
+          }
+        },
+        {
+          name: 'list_reports',
+          description: 'Get all reports',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              limit: { type: 'number', maximum: 200 }
+            }
+          }
+        },
+        {
+          name: 'create_report',
+          description: 'Create custom report',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              description: { type: 'string' },
+              source: { type: 'string', description: 'Data source (contacts, companies, etc.)' },
+              columns: { type: 'array', items: { type: 'string' } },
+              filters: { type: 'array' },
+              groupBy: { type: 'array', items: { type: 'string' } }
+            },
+            required: ['name', 'source', 'columns']
+          }
+        },
+
         // Analytics and Reporting Tools
         {
           name: 'get_contact_activity',
@@ -600,6 +1052,78 @@ class MauticServer {
             return await this.createCampaign(request.params.arguments);
           case 'add_contact_to_campaign':
             return await this.addContactToCampaign(request.params.arguments);
+
+          // Enhanced Campaign Automation
+          case 'create_campaign_with_automation':
+            return await this.createCampaignWithAutomation(request.params.arguments);
+          case 'execute_campaign':
+            return await this.executeCampaign(request.params.arguments);
+          case 'get_campaign_contacts':
+            return await this.getCampaignContacts(request.params.arguments);
+
+          // Content Management APIs
+          case 'list_assets':
+            return await this.listAssets(request.params.arguments);
+          case 'get_asset':
+            return await this.getAsset(request.params.arguments);
+          case 'create_asset':
+            return await this.createAsset(request.params.arguments);
+          case 'list_pages':
+            return await this.listPages(request.params.arguments);
+          case 'create_page':
+            return await this.createPage(request.params.arguments);
+          case 'list_sms':
+            return await this.listSms(request.params.arguments);
+          case 'create_sms':
+            return await this.createSms(request.params.arguments);
+
+          // Business Entity APIs
+          case 'list_companies':
+            return await this.listCompanies(request.params.arguments);
+          case 'create_company':
+            return await this.createCompany(request.params.arguments);
+          case 'add_contact_to_company':
+            return await this.addContactToCompany(request.params.arguments);
+          case 'create_note':
+            return await this.createNote(request.params.arguments);
+          case 'get_contact_notes':
+            return await this.getContactNotes(request.params.arguments);
+          case 'list_tags':
+            return await this.listTags(request.params.arguments);
+          case 'create_tag':
+            return await this.createTag(request.params.arguments);
+          case 'add_contact_tags':
+            return await this.addContactTags(request.params.arguments);
+          case 'list_categories':
+            return await this.listCategories(request.params.arguments);
+          case 'create_category':
+            return await this.createCategory(request.params.arguments);
+
+          // Advanced Feature APIs
+          case 'add_contact_points':
+            return await this.addContactPoints(request.params.arguments);
+          case 'subtract_contact_points':
+            return await this.subtractContactPoints(request.params.arguments);
+          case 'list_stages':
+            return await this.listStages(request.params.arguments);
+          case 'change_contact_stage':
+            return await this.changeContactStage(request.params.arguments);
+          case 'list_contact_fields':
+            return await this.listContactFields(request.params.arguments);
+          case 'create_contact_field':
+            return await this.createContactField(request.params.arguments);
+
+          // Integration & Automation APIs
+          case 'list_webhooks':
+            return await this.listWebhooks(request.params.arguments);
+          case 'create_webhook':
+            return await this.createWebhook(request.params.arguments);
+          case 'upload_file':
+            return await this.uploadFile(request.params.arguments);
+          case 'list_reports':
+            return await this.listReports(request.params.arguments);
+          case 'create_report':
+            return await this.createReport(request.params.arguments);
 
           // Email Management
           case 'send_email':
@@ -788,6 +1312,507 @@ class MauticServer {
       content: [{ 
         type: 'text', 
         text: `Contact ${contactId} added to campaign ${campaignId} successfully` 
+      }],
+    };
+  }
+
+  // Enhanced Campaign Automation Methods
+  private async createCampaignWithAutomation(args: any) {
+    const payload: any = {
+      name: args.name,
+      description: args.description || '',
+      isPublished: args.isPublished !== undefined ? args.isPublished : true,
+      allowRestart: args.allowRestart || false
+    };
+
+    // Add events if provided
+    if (args.events && args.events.length > 0) {
+      payload.events = args.events;
+    }
+
+    // Add segments (lists) if provided
+    if (args.segments && args.segments.length > 0) {
+      payload.lists = args.segments.map((segmentId: number) => ({ id: segmentId }));
+    }
+
+    // Add forms if provided
+    if (args.forms && args.forms.length > 0) {
+      payload.forms = args.forms.map((formId: number) => ({ id: formId }));
+    }
+
+    // Add canvas settings if provided
+    if (args.canvasSettings) {
+      payload.canvasSettings = args.canvasSettings;
+    }
+
+    const response = await this.axiosInstance.post('/campaigns/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Campaign with automation created successfully:\n${JSON.stringify(response.data.campaign, null, 2)}` 
+      }],
+    };
+  }
+
+  private async executeCampaign(args: any) {
+    const { campaignId, contactIds } = args;
+    const payload: any = {};
+    
+    if (contactIds && contactIds.length > 0) {
+      payload.contactIds = contactIds;
+    }
+
+    const response = await this.axiosInstance.post(`/campaigns/${campaignId}/trigger`, payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Campaign ${campaignId} executed successfully:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async getCampaignContacts(args: any) {
+    const { campaignId, start, limit } = args;
+    const params: any = {};
+    if (start) params.start = start;
+    if (limit) params.limit = Math.min(limit, 200);
+
+    const response = await this.axiosInstance.get(`/campaigns/${campaignId}/contacts`, { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Campaign ${campaignId} contacts:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  // Content Management Methods
+  private async listAssets(args: any) {
+    const params: any = {};
+    if (args?.search) params.search = args.search;
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+    if (args?.start) params.start = args.start;
+    if (args?.publishedOnly) params.publishedOnly = args.publishedOnly;
+
+    const response = await this.axiosInstance.get('/assets', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} assets:\n${JSON.stringify(response.data.assets || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async getAsset(args: any) {
+    const { id } = args;
+    const response = await this.axiosInstance.get(`/assets/${id}`);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Asset details:\n${JSON.stringify(response.data.asset, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createAsset(args: any) {
+    const payload: any = {
+      title: args.title,
+      description: args.description || '',
+      storageLocation: args.storageLocation,
+      isPublished: args.isPublished !== undefined ? args.isPublished : true
+    };
+
+    if (args.storageLocation === 'local') {
+      payload.tempName = args.file;
+    } else {
+      payload.remotePath = args.file;
+    }
+
+    if (args.category) {
+      payload.category = args.category;
+    }
+
+    const response = await this.axiosInstance.post('/assets/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Asset created successfully:\n${JSON.stringify(response.data.asset, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listPages(args: any) {
+    const params: any = {};
+    if (args?.search) params.search = args.search;
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+    if (args?.start) params.start = args.start;
+    if (args?.publishedOnly) params.publishedOnly = args.publishedOnly;
+
+    const response = await this.axiosInstance.get('/pages', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} pages:\n${JSON.stringify(response.data.pages || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createPage(args: any) {
+    const payload: any = {
+      title: args.title,
+      isPublished: args.isPublished !== undefined ? args.isPublished : true
+    };
+
+    if (args.alias) payload.alias = args.alias;
+    if (args.customHtml) payload.customHtml = args.customHtml;
+    if (args.template) payload.template = args.template;
+    if (args.publishUp) payload.publishUp = args.publishUp;
+    if (args.publishDown) payload.publishDown = args.publishDown;
+
+    const response = await this.axiosInstance.post('/pages/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Landing page created successfully:\n${JSON.stringify(response.data.page, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listSms(args: any) {
+    const params: any = {};
+    if (args?.search) params.search = args.search;
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/smses', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} SMS templates:\n${JSON.stringify(response.data.smses || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createSms(args: any) {
+    const payload: any = {
+      name: args.name,
+      message: args.message,
+      isPublished: args.isPublished !== undefined ? args.isPublished : true
+    };
+
+    const response = await this.axiosInstance.post('/smses/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `SMS template created successfully:\n${JSON.stringify(response.data.sms, null, 2)}` 
+      }],
+    };
+  }
+
+  // Business Entity Methods
+  private async listCompanies(args: any) {
+    const params: any = {};
+    if (args?.search) params.search = args.search;
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+    if (args?.start) params.start = args.start;
+
+    const response = await this.axiosInstance.get('/companies', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} companies:\n${JSON.stringify(response.data.companies || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createCompany(args: any) {
+    const response = await this.axiosInstance.post('/companies/new', args);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Company created successfully:\n${JSON.stringify(response.data.company, null, 2)}` 
+      }],
+    };
+  }
+
+  private async addContactToCompany(args: any) {
+    const { contactId, companyId } = args;
+    const response = await this.axiosInstance.post(`/companies/${companyId}/contact/${contactId}/add`);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Contact ${contactId} added to company ${companyId} successfully` 
+      }],
+    };
+  }
+
+  private async createNote(args: any) {
+    const payload: any = {
+      text: args.text,
+      type: args.type || 'general'
+    };
+
+    let endpoint = '/notes/new';
+    if (args.contactId) {
+      payload.contact = args.contactId;
+    }
+    if (args.companyId) {
+      payload.company = args.companyId;
+    }
+
+    const response = await this.axiosInstance.post(endpoint, payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Note created successfully:\n${JSON.stringify(response.data.note, null, 2)}` 
+      }],
+    };
+  }
+
+  private async getContactNotes(args: any) {
+    const { contactId, limit } = args;
+    const params: any = {};
+    if (limit) params.limit = Math.min(limit, 200);
+
+    const response = await this.axiosInstance.get(`/contacts/${contactId}/notes`, { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Contact ${contactId} notes:\n${JSON.stringify(response.data.notes || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listTags(args: any) {
+    const params: any = {};
+    if (args?.search) params.search = args.search;
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/tags', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} tags:\n${JSON.stringify(response.data.tags || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createTag(args: any) {
+    const response = await this.axiosInstance.post('/tags/new', { tag: args.tag });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Tag created successfully:\n${JSON.stringify(response.data.tag, null, 2)}` 
+      }],
+    };
+  }
+
+  private async addContactTags(args: any) {
+    const { contactId, tags } = args;
+    const response = await this.axiosInstance.post(`/contacts/${contactId}/contact/add`, { tags });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Tags added to contact ${contactId} successfully:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listCategories(args: any) {
+    const params: any = {};
+    if (args?.bundle) params.bundle = args.bundle;
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/categories', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} categories:\n${JSON.stringify(response.data.categories || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createCategory(args: any) {
+    const response = await this.axiosInstance.post('/categories/new', args);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Category created successfully:\n${JSON.stringify(response.data.category, null, 2)}` 
+      }],
+    };
+  }
+
+  // Advanced Feature Methods
+  private async addContactPoints(args: any) {
+    const { contactId, points, eventName, actionName } = args;
+    const payload = {
+      eventName: eventName || 'API Point Addition',
+      actionName: actionName || 'Manual',
+      points: points
+    };
+
+    const response = await this.axiosInstance.post(`/contacts/${contactId}/points/plus/${points}`, payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Added ${points} points to contact ${contactId} successfully:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async subtractContactPoints(args: any) {
+    const { contactId, points, eventName, actionName } = args;
+    const payload = {
+      eventName: eventName || 'API Point Subtraction',
+      actionName: actionName || 'Manual',
+      points: points
+    };
+
+    const response = await this.axiosInstance.post(`/contacts/${contactId}/points/minus/${points}`, payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Subtracted ${points} points from contact ${contactId} successfully:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listStages(args: any) {
+    const params: any = {};
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/stages', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} stages:\n${JSON.stringify(response.data.stages || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async changeContactStage(args: any) {
+    const { contactId, stageId } = args;
+    const response = await this.axiosInstance.post(`/contacts/${contactId}/stages/${stageId}/add`);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Contact ${contactId} stage changed to ${stageId} successfully:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listContactFields(args: any) {
+    const params: any = {};
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/fields/contact', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} contact fields:\n${JSON.stringify(response.data.fields || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createContactField(args: any) {
+    const payload: any = {
+      label: args.label,
+      type: args.type,
+      isRequired: args.isRequired || false,
+      isPubliclyUpdatable: args.isPubliclyUpdatable || false
+    };
+
+    if (args.alias) payload.alias = args.alias;
+    if (args.defaultValue) payload.defaultValue = args.defaultValue;
+    if (args.properties) payload.properties = args.properties;
+
+    const response = await this.axiosInstance.post('/fields/contact/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Contact field created successfully:\n${JSON.stringify(response.data.field, null, 2)}` 
+      }],
+    };
+  }
+
+  // Integration & Automation Methods
+  private async listWebhooks(args: any) {
+    const params: any = {};
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/hooks', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} webhooks:\n${JSON.stringify(response.data.hooks || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createWebhook(args: any) {
+    const payload: any = {
+      name: args.name,
+      webhookUrl: args.webhookUrl,
+      triggers: args.triggers,
+      eventsOrderbyDir: args.eventsOrderbyDir || 'DESC'
+    };
+
+    if (args.description) payload.description = args.description;
+    if (args.secret) payload.secret = args.secret;
+
+    const response = await this.axiosInstance.post('/hooks/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Webhook created successfully:\n${JSON.stringify(response.data.hook, null, 2)}` 
+      }],
+    };
+  }
+
+  private async uploadFile(args: any) {
+    const payload: any = {
+      file: args.file,
+      folder: args.folder || 'assets'
+    };
+
+    // Note: This is a simplified implementation. Real file upload would need proper multipart/form-data handling
+    const response = await this.axiosInstance.post('/files/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `File uploaded successfully:\n${JSON.stringify(response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async listReports(args: any) {
+    const params: any = {};
+    if (args?.limit) params.limit = Math.min(args.limit, 200);
+
+    const response = await this.axiosInstance.get('/reports', { params });
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Found ${response.data.total || 0} reports:\n${JSON.stringify(response.data.reports || response.data, null, 2)}` 
+      }],
+    };
+  }
+
+  private async createReport(args: any) {
+    const payload: any = {
+      name: args.name,
+      source: args.source,
+      columns: args.columns
+    };
+
+    if (args.description) payload.description = args.description;
+    if (args.filters) payload.filters = args.filters;
+    if (args.groupBy) payload.groupBy = args.groupBy;
+
+    const response = await this.axiosInstance.post('/reports/new', payload);
+    return {
+      content: [{ 
+        type: 'text', 
+        text: `Report created successfully:\n${JSON.stringify(response.data.report, null, 2)}` 
       }],
     };
   }

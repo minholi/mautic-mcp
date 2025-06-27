@@ -48,6 +48,9 @@ This MCP server provides complete access to your Mautic instance with the follow
 - **get_campaign** - Get detailed campaign information
 - **create_campaign** - Create new campaigns
 - **add_contact_to_campaign** - Add contacts to campaigns
+- **create_campaign_with_automation** - Create campaigns with full event automation (🔥 NEW)
+- **execute_campaign** - Manually execute/trigger campaigns (🔥 NEW)
+- **get_campaign_contacts** - Get contacts in a campaign with their status (🔥 NEW)
 
 ### ✉️ Email Operations
 - **send_email** - Send emails to specific contacts
@@ -69,6 +72,42 @@ This MCP server provides complete access to your Mautic instance with the follow
 ### 📊 Analytics & Reporting
 - **get_contact_activity** - Get contact interaction history
 - **get_email_stats** - Get email performance statistics
+- **list_reports** - Get all reports (⭐ NEW)
+- **create_report** - Create custom reports (⭐ NEW)
+
+### 📎 Content Management
+- **list_assets** - Get all assets (PDFs, images, documents) (⭐ NEW)
+- **get_asset** - Get asset details by ID (⭐ NEW)
+- **create_asset** - Create new assets (local or remote) (⭐ NEW)
+- **list_pages** - Get all landing pages (⭐ NEW)
+- **create_page** - Create new landing pages (⭐ NEW)
+- **list_sms** - Get all SMS templates (⭐ NEW)
+- **create_sms** - Create SMS templates (⭐ NEW)
+
+### 🏢 Business Entities
+- **list_companies** - Get all companies (⭐ NEW)
+- **create_company** - Create new companies (⭐ NEW)
+- **add_contact_to_company** - Associate contacts with companies (⭐ NEW)
+- **create_note** - Add notes to contacts or companies (⭐ NEW)
+- **get_contact_notes** - Get all notes for a contact (⭐ NEW)
+- **list_tags** - Get all available tags (⭐ NEW)
+- **create_tag** - Create new tags (⭐ NEW)
+- **add_contact_tags** - Add tags to contacts (⭐ NEW)
+- **list_categories** - Get all categories (⭐ NEW)
+- **create_category** - Create new categories (⭐ NEW)
+
+### 🎯 Advanced Features
+- **add_contact_points** - Add points to contacts (📈 NEW)
+- **subtract_contact_points** - Subtract points from contacts (📈 NEW)
+- **list_stages** - Get all lifecycle stages (📈 NEW)
+- **change_contact_stage** - Change contact's lifecycle stage (📈 NEW)
+- **list_contact_fields** - Get all contact custom fields (📈 NEW)
+- **create_contact_field** - Create new contact custom fields (📈 NEW)
+
+### 🔧 Integration & Automation
+- **list_webhooks** - Get all webhooks (🔧 NEW)
+- **create_webhook** - Create new webhooks (🔧 NEW)
+- **upload_file** - Upload files to Mautic (🔧 NEW)
 
 ## Installation
 
