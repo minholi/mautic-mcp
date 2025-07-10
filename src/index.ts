@@ -1553,7 +1553,7 @@ class MauticServer {
 
     let endpoint = '/notes/new';
     if (args.contactId) {
-      payload.contact = args.contactId;
+      payload.lead = args.contactId;
     }
     if (args.companyId) {
       payload.company = args.companyId;
